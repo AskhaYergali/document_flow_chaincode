@@ -1,0 +1,55 @@
+plugins {
+    id 'java'
+    id 'application'
+    id 'com.github.johnrengelman.shadow' version '8.1.1'
+}
+
+group = 'com.example'
+version = '1.0'
+
+repositories {
+    mavenCentral()
+    maven { url 'https://jitpack.io' }
+}
+
+dependencies {
+    implementation 'org.hyperledger.fabric-chaincode-java:fabric-chaincode-shim:2.5.8'
+    implementation 'com.owlike:genson:1.6'
+}
+
+application {
+    mainClass = 'org.hyperledger.fabric.contract.ContractRouter'
+}
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
+}
+
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
+}
+
+jar {
+    duplicatesStrategy = DuplicatesStrategy.INCLUDE
+}
+
+shadowJar {
+    archiveClassifier.set('')     // produce build/libs/document-1.0.jar (no "-all")
+    mergeServiceFiles()           // critical for META-INF/services/*
+}
+
+/**
+ * Ensure the application distribution uses the shadowJar and not the plain jar,
+ * avoiding duplicate lib jars.
+ */
+tasks.named("distTar") { dependsOn(tasks.named("shadowJar")) }
+tasks.named("distZip") { dependsOn(tasks.named("shadowJar")) }
+tasks.named("installDist") { dependsOn(tasks.named("shadowJar")) }
+tasks.named("startScripts") { dependsOn(tasks.named("shadowJar")) }
+
+// Prevent duplicate complaints in Gradle 8 copy tasks
+tasks.withType(Copy).configureEach {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
