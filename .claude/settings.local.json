@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(.gradlew.bat shadowJar)",
+      "Bash(./gradlew.bat shadowJar:*)",
+      "Bash(gradle shadowJar:*)",
+      "Bash(java -version)",
+      "Bash(javac:*)",
+      "Bash(chmod:*)"
+    ]
+  }
+}
